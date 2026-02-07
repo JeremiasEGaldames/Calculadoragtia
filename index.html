@@ -40,6 +40,11 @@
       <div class="text-xs text-slate-400 mt-1">AR$ 50.000 por noche</div>
     </div>
 
+    <div class="mb-4 flex items-center gap-2">
+      <input id="paxArgentino" type="checkbox" class="w-4 h-4" />
+      <label class="text-sm text-slate-600">Pax argentino (sumar IVA 21%)</label>
+    </div>
+
     <div class="flex flex-col gap-3 mt-6">
       <button
         onclick="convert()"
@@ -96,17 +101,20 @@
     function convert() {
       const usd = parseFloat(document.getElementById("usd").value) || 0;
       const nights = parseInt(document.getElementById("nights").value) || 0;
+      const paxArgentino = document.getElementById("paxArgentino").checked;
 
       if (!exchangeRate) {
         alert("Cotización aún no cargada");
         return;
       }
 
-      // LÓGICA SOLICITADA
       const usdPerNights = usd * nights;
       const usdTotalArs = usdPerNights * exchangeRate;
       const nightsArs = nights * NIGHT_PRICE;
-      const total = usdTotalArs + nightsArs;
+
+      const alojamientoTotal = usdTotalArs + nightsArs;
+      const iva = paxArgentino ? alojamientoTotal * 0.21 : 0;
+      const total = alojamientoTotal + iva;
 
       document.getElementById("ars").innerText =
         "$" + total.toLocaleString("es-AR", {
@@ -118,6 +126,8 @@
         <div>USD × noches: <strong>${usdPerNights.toLocaleString("es-AR")} USD</strong></div>
         <div>USD total de noches × cotización: <strong>$${usdTotalArs.toLocaleString("es-AR")}</strong></div>
         <div>Noches × AR$ 50.000: <strong>$${nightsArs.toLocaleString("es-AR")}</strong></div>
+        <div>Alojamiento total: <strong>$${alojamientoTotal.toLocaleString("es-AR")}</strong></div>
+        ${paxArgentino ? `<div>IVA 21%: <strong>$${iva.toLocaleString("es-AR")}</strong></div>` : ""}
         <hr class="my-2">
         <div class="font-semibold">TOTAL GARANTÍA: $${total.toLocaleString("es-AR")}</div>
       `;
@@ -142,6 +152,7 @@
     function resetCalc() {
       document.getElementById("usd").value = "";
       document.getElementById("nights").value = "";
+      document.getElementById("paxArgentino").checked = false;
       document.getElementById("ars").innerText = "—";
       document.getElementById("detail").innerHTML = "";
     }
